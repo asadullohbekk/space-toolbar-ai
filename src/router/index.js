@@ -6,6 +6,8 @@ import Login from "@/pages/auth/Login.vue";
 import Register from "@/pages/auth/Register.vue";
 import ResetPassword from "@/pages/auth/ResetPassword.vue";
 import Dashboard from "@/pages/dashboard/index.vue";
+import FaceRecognition from "@/pages/face-recognition.vue";
+import Chatbot from "@/pages/chatbot.vue";
 import { isAuthenticated } from "@/lib/auth";
 
 const routes = [
@@ -46,6 +48,18 @@ const routes = [
     path: "/dashboard",
     name: "Dashboard",
     component: Dashboard,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/face-recognition",
+    name: "FaceRecognition",
+    component: FaceRecognition,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/chatbot",
+    name: "Chatbot",
+    component: Chatbot,
     meta: { requiresAuth: true },
   },
 ];

@@ -1,95 +1,473 @@
 <script setup lang="ts">
-import { ArrowRight, CheckCircle, Star } from "lucide-vue-next";
+import {
+  Brain,
+  Eye,
+  Mic,
+  Heart,
+  GraduationCap,
+  ShoppingCart,
+  Building2,
+  Newspaper,
+  ArrowRight,
+  Zap,
+  Users,
+  TrendingUp,
+  Shield,
+  Globe,
+} from "lucide-vue-next";
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto pt-4">
-    <!-- Hero Section -->
-    <div class="text-center mb-16">
-      <h1 class="text-5xl font-bold text-gray-900 mb-6">
-        Welcome to Our Platform
-      </h1>
-      <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-        We build innovative solutions that help businesses grow and succeed in the digital age. 
-        Our team of experts is dedicated to delivering exceptional results.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <button class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
-          Get Started
-          <ArrowRight class="w-5 h-5 ml-2" />
-        </button>
-        <button class="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 transition-colors">
-          Learn More
-        </button>
-      </div>
-    </div>
-
-    <!-- Features Section -->
-    <div class="grid md:grid-cols-3 gap-8 mb-16">
-      <div class="text-center">
-        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle class="w-8 h-8 text-blue-600" />
-        </div>
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">Quality Assurance</h3>
-        <p class="text-gray-600">
-          We maintain the highest standards in every project, ensuring quality and reliability.
-        </p>
-      </div>
-      
-      <div class="text-center">
-        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Star class="w-8 h-8 text-green-600" />
-        </div>
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">Innovation</h3>
-        <p class="text-gray-600">
-          Cutting-edge solutions that keep you ahead of the competition and market trends.
-        </p>
-      </div>
-      
-      <div class="text-center">
-        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle class="w-8 h-8 text-purple-600" />
-        </div>
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">Support</h3>
-        <p class="text-gray-600">
-          24/7 support and maintenance to ensure your systems run smoothly.
-        </p>
-      </div>
-    </div>
-
-    <!-- Stats Section -->
-    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-8 text-white mb-16">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-        <div>
-          <div class="text-4xl font-bold mb-2">500+</div>
-          <div class="text-blue-100">Happy Clients</div>
-        </div>
-        <div>
-          <div class="text-4xl font-bold mb-2">1000+</div>
-          <div class="text-blue-100">Projects Completed</div>
-        </div>
-        <div>
-          <div class="text-4xl font-bold mb-2">50+</div>
-          <div class="text-blue-100">Team Members</div>
-        </div>
-        <div>
-          <div class="text-4xl font-bold mb-2">99%</div>
-          <div class="text-blue-100">Client Satisfaction</div>
+  <div class="min-h-screen">
+    <!-- Header Section -->
+    <div
+      class="bg-white/80 w-full rounded-2xl backdrop-blur-sm border-b border-gray-200/50"
+    >
+      <div class="mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1
+              class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+            >
+              AI Platform Dashboard
+            </h1>
+            <p class="text-gray-600 mt-1">
+              Powering the future with intelligent solutions
+            </p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div
+              class="hidden sm:flex items-center space-x-2 text-sm text-gray-600"
+            >
+              <div
+                class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+              ></div>
+              <span>System Online</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- CTA Section -->
-    <div class="text-center">
-      <h2 class="text-3xl font-bold text-gray-900 mb-4">
-        Ready to Get Started?
-      </h2>
-      <p class="text-lg text-gray-600 mb-8">
-        Join hundreds of satisfied customers who trust us with their projects.
-      </p>
-      <button class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-        Contact Us Today
-      </button>
+    <div class="mx-auto px-4 sm:px-6 lg:px-0 py-5">
+      <!-- Stats Overview -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div
+          class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Active Agents</p>
+              <p class="text-2xl font-bold text-gray-900">24</p>
+            </div>
+            <div
+              class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"
+            >
+              <Zap class="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+          <div class="mt-4 flex items-center text-sm text-green-600">
+            <TrendingUp class="w-4 h-4 mr-1" />
+            <span>+12% from last month</span>
+          </div>
+        </div>
+
+        <div
+          class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">
+                Processing Requests
+              </p>
+              <p class="text-2xl font-bold text-gray-900">1,247</p>
+            </div>
+            <div
+              class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"
+            >
+              <Brain class="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+          <div class="mt-4 flex items-center text-sm text-green-600">
+            <TrendingUp class="w-4 h-4 mr-1" />
+            <span>+8% from last month</span>
+          </div>
+        </div>
+
+        <div
+          class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Active Users</p>
+              <p class="text-2xl font-bold text-gray-900">892</p>
+            </div>
+            <div
+              class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center"
+            >
+              <Users class="w-6 h-6 text-purple-600" />
+            </div>
+          </div>
+          <div class="mt-4 flex items-center text-sm text-green-600">
+            <TrendingUp class="w-4 h-4 mr-1" />
+            <span>+15% from last month</span>
+          </div>
+        </div>
+
+        <div
+          class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Success Rate</p>
+              <p class="text-2xl font-bold text-gray-900">99.2%</p>
+            </div>
+            <div
+              class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center"
+            >
+              <Shield class="w-6 h-6 text-indigo-600" />
+            </div>
+          </div>
+          <div class="mt-4 flex items-center text-sm text-green-600">
+            <TrendingUp class="w-4 h-4 mr-1" />
+            <span>+0.3% from last month</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Agents Section -->
+      <div class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">AI Agents</h2>
+          <button
+            class="text-blue-600 hover:text-blue-700 font-medium flex items-center"
+          >
+            View All
+            <ArrowRight class="w-4 h-4 ml-1" />
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- NLP Agent -->
+          <div
+            class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center"
+              >
+                <Brain class="w-6 h-6 text-white" />
+              </div>
+              <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              Natural Language Processing
+            </h3>
+            <p class="text-gray-600 mb-4">
+              Advanced text analysis, sentiment detection, and language
+              understanding capabilities.
+            </p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500">Status:</span>
+                <span
+                  class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium"
+                  >Active</span
+                >
+              </div>
+              <div class="text-sm text-gray-500">Processing: 156 req/min</div>
+            </div>
+          </div>
+
+          <!-- Computer Vision Agent -->
+          <div
+            class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center"
+              >
+                <Eye class="w-6 h-6 text-white" />
+              </div>
+              <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              Computer Vision
+            </h3>
+            <p class="text-gray-600 mb-4">
+              Image recognition, object detection, and visual data analysis
+              solutions.
+            </p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500">Status:</span>
+                <span
+                  class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium"
+                  >Active</span
+                >
+              </div>
+              <div class="text-sm text-gray-500">Processing: 89 req/min</div>
+            </div>
+          </div>
+
+          <!-- Audio Processing Agent -->
+          <div
+            class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center"
+              >
+                <Mic class="w-6 h-6 text-white" />
+              </div>
+              <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              Audio Processing
+            </h3>
+            <p class="text-gray-600 mb-4">
+              Speech recognition, audio analysis, and sound processing
+              capabilities.
+            </p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500">Status:</span>
+                <span
+                  class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium"
+                  >Active</span
+                >
+              </div>
+              <div class="text-sm text-gray-500">Processing: 67 req/min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Industry Solutions Section -->
+      <div class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Industry Solutions</h2>
+          <button
+            class="text-blue-600 hover:text-blue-700 font-medium flex items-center"
+          >
+            Explore All
+            <ArrowRight class="w-4 h-4 ml-1" />
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Healthcare -->
+          <div
+            class="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-6 border border-red-200/50 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center"
+              >
+                <Heart class="w-6 h-6 text-white" />
+              </div>
+              <div class="text-sm text-red-600 font-medium">Healthcare</div>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              Healthcare AI
+            </h3>
+            <p class="text-gray-600 mb-4">
+              Diagnostic assistance, patient monitoring, and medical data
+              analysis solutions.
+            </p>
+            <div class="flex items-center text-red-600 font-medium text-sm">
+              Learn More
+              <ArrowRight
+                class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
+              />
+            </div>
+          </div>
+
+          <!-- Education -->
+          <div
+            class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200/50 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center"
+              >
+                <GraduationCap class="w-6 h-6 text-white" />
+              </div>
+              <div class="text-sm text-blue-600 font-medium">Education</div>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              Educational AI
+            </h3>
+            <p class="text-gray-600 mb-4">
+              Personalized learning, automated grading, and educational content
+              optimization.
+            </p>
+            <div class="flex items-center text-blue-600 font-medium text-sm">
+              Learn More
+              <ArrowRight
+                class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
+              />
+            </div>
+          </div>
+
+          <!-- Retail -->
+          <div
+            class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200/50 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center"
+              >
+                <ShoppingCart class="w-6 h-6 text-white" />
+              </div>
+              <div class="text-sm text-green-600 font-medium">Retail</div>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Retail AI</h3>
+            <p class="text-gray-600 mb-4">
+              Inventory management, customer behavior analysis, and personalized
+              recommendations.
+            </p>
+            <div class="flex items-center text-green-600 font-medium text-sm">
+              Learn More
+              <ArrowRight
+                class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
+              />
+            </div>
+          </div>
+
+          <!-- Government -->
+          <div
+            class="bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl p-6 border border-slate-200/50 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-slate-500 to-gray-500 rounded-lg flex items-center justify-center"
+              >
+                <Building2 class="w-6 h-6 text-white" />
+              </div>
+              <div class="text-sm text-slate-600 font-medium">Government</div>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              Government AI
+            </h3>
+            <p class="text-gray-600 mb-4">
+              Public service automation, data analysis, and citizen engagement
+              solutions.
+            </p>
+            <div class="flex items-center text-slate-600 font-medium text-sm">
+              Learn More
+              <ArrowRight
+                class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
+              />
+            </div>
+          </div>
+
+          <!-- Business -->
+          <div
+            class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-200/50 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center"
+              >
+                <TrendingUp class="w-6 h-6 text-white" />
+              </div>
+              <div class="text-sm text-amber-600 font-medium">Business</div>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              Business AI
+            </h3>
+            <p class="text-gray-600 mb-4">
+              Process automation, predictive analytics, and business
+              intelligence solutions.
+            </p>
+            <div class="flex items-center text-amber-600 font-medium text-sm">
+              Learn More
+              <ArrowRight
+                class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
+              />
+            </div>
+          </div>
+
+          <!-- Media -->
+          <div
+            class="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-6 border border-purple-200/50 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-500 rounded-lg flex items-center justify-center"
+              >
+                <Newspaper class="w-6 h-6 text-white" />
+              </div>
+              <div class="text-sm text-purple-600 font-medium">Media</div>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Media AI</h3>
+            <p class="text-gray-600 mb-4">
+              Content generation, audience analysis, and media optimization
+              solutions.
+            </p>
+            <div class="flex items-center text-purple-600 font-medium text-sm">
+              Learn More
+              <ArrowRight
+                class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity Section -->
+      <div
+        class="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-sm"
+      >
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>
+        <div class="space-y-4">
+          <div class="flex items-center space-x-4 p-4 bg-gray-50/50 rounded-lg">
+            <div
+              class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"
+            >
+              <Brain class="w-5 h-5 text-blue-600" />
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">
+                NLP Agent processed 1,247 text requests
+              </p>
+              <p class="text-xs text-gray-500">2 minutes ago</p>
+            </div>
+            <div class="text-sm text-green-600 font-medium">+15%</div>
+          </div>
+
+          <div class="flex items-center space-x-4 p-4 bg-gray-50/50 rounded-lg">
+            <div
+              class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"
+            >
+              <Eye class="w-5 h-5 text-green-600" />
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">
+                Computer Vision completed image analysis batch
+              </p>
+              <p class="text-xs text-gray-500">5 minutes ago</p>
+            </div>
+            <div class="text-sm text-green-600 font-medium">+8%</div>
+          </div>
+
+          <div class="flex items-center space-x-4 p-4 bg-gray-50/50 rounded-lg">
+            <div
+              class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"
+            >
+              <Mic class="w-5 h-5 text-purple-600" />
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">
+                Audio Processing agent optimized speech recognition
+              </p>
+              <p class="text-xs text-gray-500">12 minutes ago</p>
+            </div>
+            <div class="text-sm text-green-600 font-medium">+12%</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
