@@ -24,7 +24,7 @@ const password = ref("");
 
 async function onSubmit() {
   clearError();
-  
+
   if (!email.value || !password.value) {
     toast.error("Please fill in all fields", {
       position: "top-right",
@@ -35,16 +35,16 @@ async function onSubmit() {
 
   try {
     const response = await login({
-      email_or_username: email.value,
+      username_or_email: email.value,
       password: password.value,
     });
-    
-    // Show success toast
-    toast.success("Login successful! Redirecting to dashboard...", {
+
+    // Show success toast with backend message
+    toast.success(response.success || "Login successful! Redirecting to dashboard...", {
       position: "top-right",
       duration: 2000,
     });
-    
+
     // Login successful, redirect to dashboard
     setTimeout(() => {
       router.push("/dashboard");

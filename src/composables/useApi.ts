@@ -1,5 +1,5 @@
 import { ref, readonly } from "vue";
-import { setAuthToken, clearAuthToken } from "@/lib/auth";
+import { setAuthToken, clearAuthToken, getAccessToken } from "@/lib/auth";
 import { useRouter } from "vue-router";
 
 interface ApiResponse<T = any> {
@@ -67,9 +67,7 @@ export function useApi() {
       };
 
       // Add auth token if available
-      const token =
-        localStorage.getItem("access_token") ||
-        document.cookie.match(/access_token=([^;]+)/)?.[1];
+      const token = getAccessToken();
       if (token) {
         config.headers = {
           ...config.headers,
@@ -81,26 +79,27 @@ export function useApi() {
 
       // Handle HTTP errors
       if (!response.ok) {
-        // Handle 401 Unauthorized
-        if (response.status === 401) {
+        // Handle 401 Unauthorized - only for expired tokens, not login failures
+        if (response.status === 401 && getAccessToken()) {
+          // Only clear auth if we have a token (means it's expired)
           clearAuthToken();
           router.push("/login");
           throw new Error("Authentication expired. Please login again.");
         }
 
-        // Handle other HTTP errors
+        // Handle other HTTP errors including login validation errors
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `HTTP ${response.status}: ${response.statusText}`
-        );
+        // Extract error message from backend response format
+        const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
 
       return {
         data,
-        message: data.message,
-        success: true,
+        message: data.message || data.success || "Success",
+        success: data.success !== undefined ? data.success : true,
       };
     } catch (err: any) {
       const apiError = handleError(err);
@@ -135,36 +134,69 @@ export function useApi() {
 
   // Auth-specific methods
   const login = async (credentials: {
-    email_or_username: string;
+    username_or_email: string;
     password: string;
   }) => {
     try {
-      const response = await post<{ token: string; user: any }>(
+      const response = await post<{ 
+        success: string; 
+        refresh: string; 
+        access: string; 
+      }>(
         "/api/auth/login",
         credentials
       );
 
-      if (response.success && response.data.token) {
-        setAuthToken(response.data.token);
+      if (response.success && response.data.access && response.data.refresh) {
+        // Save both access and refresh tokens to cookies
+        setAuthToken(response.data.access, response.data.refresh);
         return response.data;
       }
 
-      throw new Error("Login failed: No token received");
+      throw new Error("Login failed: No tokens received");
     } catch (err) {
       throw err;
     }
   };
 
-  const logout = async () => {
+  const getUserProfile = async () => {
     try {
-      await post("/api/auth/logout");
+      const response = await get<{
+        message: string;
+        result: {
+          username: string;
+          full_name: string | null;
+          email: string;
+          phone: string | null;
+          is_active: boolean;
+          voice_status: boolean;
+          balance: string;
+        };
+      }>("/api/auth/me/");
+
+      console.log("getUserProfile response:", response);
+      console.log("response.data:", response.data);
+      console.log("response.data.result:", response.data.result);
+      
+      // The request function wraps the response, so we need to access response.data
+      // response.data contains the actual backend response
+      return response.data.result;
     } catch (err) {
-      // Even if logout API fails, clear local auth
-      console.warn("Logout API failed, clearing local auth:", err);
-    } finally {
-      clearAuthToken();
-      router.push("/login");
+      console.error("getUserProfile error:", err);
+      throw err;
     }
+  };
+
+  const logout = async () => {
+    // Clear local auth tokens and redirect to login
+    clearAuthToken();
+    
+    // Dispatch logout event for other components to listen to
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('userLogout'));
+    }
+    
+    router.push("/login");
   };
 
   return {
@@ -181,6 +213,7 @@ export function useApi() {
 
     // Auth methods
     login,
+    getUserProfile,
     logout,
 
     // Utility

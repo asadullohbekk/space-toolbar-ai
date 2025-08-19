@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted } from "vue";
 import {
   Brain,
   Eye,
@@ -15,6 +16,40 @@ import {
   Shield,
   Globe,
 } from "lucide-vue-next";
+import { useUserProfile } from "@/composables/useUserProfile";
+
+// User profile management
+const { user, loading: userLoading, error: userError, fetchUserProfile, cleanup: cleanupUserProfile } = useUserProfile();
+
+// Handle page refresh and visibility change
+const handleVisibilityChange = async () => {
+  if (!document.hidden && !user.value) {
+    // Page became visible and no user data, fetch profile
+    try {
+      await fetchUserProfile();
+    } catch (error) {
+      console.error("Failed to fetch user profile on visibility change:", error);
+    }
+  }
+};
+
+// Fetch user profile on component mount
+onMounted(async () => {
+  try {
+    await fetchUserProfile();
+  } catch (error) {
+    console.error("Failed to fetch user profile:", error);
+  }
+  
+  // Add event listeners for page refresh and visibility change
+  window.addEventListener("focus", handleVisibilityChange);
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+});
+
+// Clean up event listeners
+onUnmounted(() => {
+  cleanupUserProfile();
+});
 </script>
 
 <template>

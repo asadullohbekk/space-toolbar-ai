@@ -15,16 +15,19 @@ const routes = [
     path: "/",
     name: "Home",
     component: Home,
+    meta: { requiresAuth: true },
   },
   {
     path: "/about",
     name: "About",
     component: About,
+    meta: { requiresAuth: true },
   },
   {
     path: "/contact",
     name: "Contact",
     component: Contact,
+    meta: { requiresAuth: true },
   },
   {
     path: "/login",
@@ -61,6 +64,21 @@ const routes = [
     name: "Chatbot",
     component: Chatbot,
     meta: { requiresAuth: true },
+  },
+  // Catch-all route for non-existent URLs
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    redirect: (to) => {
+      // Check if user is authenticated
+      if (isAuthenticated()) {
+        // If authenticated, redirect to dashboard
+        return { path: "/dashboard" };
+      } else {
+        // If not authenticated, redirect to login with the attempted path
+        return { path: "/login", query: { redirect: to.fullPath } };
+      }
+    },
   },
 ];
 
