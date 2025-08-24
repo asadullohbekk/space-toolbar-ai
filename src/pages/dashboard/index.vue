@@ -48,6 +48,11 @@ onMounted(async () => {
 
 // Clean up event listeners
 onUnmounted(() => {
+  // Remove event listeners
+  window.removeEventListener("focus", handleVisibilityChange);
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+  
+  // Clean up user profile
   cleanupUserProfile();
 });
 </script>

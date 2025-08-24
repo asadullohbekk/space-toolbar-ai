@@ -1,222 +1,216 @@
-import { ref, readonly } from "vue";
-import { setAuthToken, clearAuthToken, getAccessToken } from "@/lib/auth";
-import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
+import { clearAuthToken } from "@/lib/auth";
 
-interface ApiResponse<T = any> {
-  data: T;
-  message?: string;
-  success: boolean;
-}
+export const useApi = (apiUrl?: string) => {
+  const baseURL = apiUrl || "https://space.toolbar-ai.com/api";
 
-interface ApiError {
-  message: string;
-  status?: number;
-}
-
-export function useApi() {
   const loading = ref(false);
-  const error = ref<string | null>(null);
-  const router = useRouter();
 
-  const baseURL =
-    import.meta.env.VITE_API_BASE_URL || "https://space.toolbar-ai.com/";
+  // Get tokens from localStorage
+  const getAccessToken = () => localStorage.getItem("access_token");
+  const getRefreshToken = () => localStorage.getItem("refresh_token");
 
-  // Helper function to handle API errors
-  const handleError = (err: any): ApiError => {
-    if (err.response) {
-      // Server responded with error status
+  const token = computed(() => getAccessToken());
+
+  const headers = computed(() => {
+    const baseHeaders = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    if (token.value) {
       return {
-        message:
-          err.response.data?.message ||
-          `HTTP ${err.response.status}: ${err.response.statusText}`,
-        status: err.response.status,
-      };
-    } else if (err.request) {
-      // Request was made but no response received
-      return {
-        message: "No response from server. Please check your connection.",
-      };
-    } else {
-      // Something else happened
-      return {
-        message: err.message || "An unexpected error occurred",
+        ...baseHeaders,
+        Authorization: `Bearer ${token.value}`,
       };
     }
+
+    return baseHeaders;
+  });
+
+  // Store tokens in localStorage
+  const setTokens = (access: string, refresh: string) => {
+    localStorage.setItem("access_token", access);
+    localStorage.setItem("refresh_token", refresh);
   };
 
-  // Generic request function
-  const request = async <T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> => {
-    loading.value = true;
-    error.value = null;
+  // Clear tokens
+  const clearTokens = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+  };
 
+  // Logout function
+  const logout = async () => {
     try {
-      const url = `${baseURL.replace(/\/$/, "")}/${endpoint.replace(
-        /^\//,
-        ""
-      )}`;
-
-      const config: RequestInit = {
-        headers: {
-          "Content-Type": "application/json",
-          ...options.headers,
-        },
-        ...options,
-      };
-
-      // Add auth token if available
-      const token = getAccessToken();
-      if (token) {
-        config.headers = {
-          ...config.headers,
-          Authorization: `Bearer ${token}`,
-        };
-      }
-
-      const response = await fetch(url, config);
-
-      // Handle HTTP errors
-      if (!response.ok) {
-        // Handle 401 Unauthorized - only for expired tokens, not login failures
-        if (response.status === 401 && getAccessToken()) {
-          // Only clear auth if we have a token (means it's expired)
-          clearAuthToken();
-          router.push("/login");
-          throw new Error("Authentication expired. Please login again.");
-        }
-
-        // Handle other HTTP errors including login validation errors
-        const errorData = await response.json().catch(() => ({}));
-        // Extract error message from backend response format
-        const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-
-      return {
-        data,
-        message: data.message || data.success || "Success",
-        success: data.success !== undefined ? data.success : true,
-      };
-    } catch (err: any) {
-      const apiError = handleError(err);
-      error.value = apiError.message;
-
-      throw apiError;
+      // Call logout API endpoint if needed
+      // await $post("/auth/logout");
+    } catch (error) {
+      console.error("Logout API call failed:", error);
     } finally {
-      loading.value = false;
+      // Clear all tokens (both localStorage and cookies)
+      clearAuthToken();
+
+      // Redirect to login page
+      window.location.href = "/login";
     }
   };
 
-  // HTTP method helpers
-  const get = <T>(endpoint: string, options?: RequestInit) =>
-    request<T>(endpoint, { ...options, method: "GET" });
-
-  const post = <T>(endpoint: string, data?: any, options?: RequestInit) =>
-    request<T>(endpoint, {
-      ...options,
-      method: "POST",
-      body: data ? JSON.stringify(data) : undefined,
-    });
-
-  const put = <T>(endpoint: string, data?: any, options?: RequestInit) =>
-    request<T>(endpoint, {
-      ...options,
-      method: "PUT",
-      body: data ? JSON.stringify(data) : undefined,
-    });
-
-  const del = <T>(endpoint: string, options?: RequestInit) =>
-    request<T>(endpoint, { ...options, method: "DELETE" });
-
-  // Auth-specific methods
-  const login = async (credentials: {
-    username_or_email: string;
-    password: string;
-  }) => {
-    try {
-      const response = await post<{ 
-        success: string; 
-        refresh: string; 
-        access: string; 
-      }>(
-        "/api/auth/login",
-        credentials
-      );
-
-      if (response.success && response.data.access && response.data.refresh) {
-        // Save both access and refresh tokens to cookies
-        setAuthToken(response.data.access, response.data.refresh);
-        return response.data;
-      }
-
-      throw new Error("Login failed: No tokens received");
-    } catch (err) {
-      throw err;
-    }
-  };
-
+  // Get user profile function
   const getUserProfile = async () => {
     try {
-      const response = await get<{
-        message: string;
-        result: {
-          username: string;
-          full_name: string | null;
-          email: string;
-          phone: string | null;
-          is_active: boolean;
-          voice_status: boolean;
-          balance: string;
-        };
-      }>("/api/auth/me/");
-
-      console.log("getUserProfile response:", response);
-      console.log("response.data:", response.data);
-      console.log("response.data.result:", response.data.result);
+      const response = await $get("/auth/me/");
+      console.log("getUserProfile: Full API response:", response);
       
-      // The request function wraps the response, so we need to access response.data
-      // response.data contains the actual backend response
-      return response.data.result;
-    } catch (err) {
-      console.error("getUserProfile error:", err);
-      throw err;
+      // Extract user data from the result property
+      const userData = response.result;
+      console.log("getUserProfile: Extracted user data:", userData);
+      
+      return userData;
+    } catch (error) {
+      console.error("Failed to get user profile:", error);
+      throw error;
     }
   };
 
-  const logout = async () => {
-    // Clear local auth tokens and redirect to login
-    clearAuthToken();
-    
-    // Dispatch logout event for other components to listen to
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('userLogout'));
+  async function $fetch(endpoint: string, options: RequestInit = {}) {
+    const url = `${baseURL}${endpoint}`;
+
+    const config: RequestInit = {
+      ...options,
+      headers: {
+        ...headers.value,
+        ...options.headers,
+      },
+    };
+
+    try {
+      const response = await fetch(url, config);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("API request failed:", error);
+      throw error;
     }
-    
-    router.push("/login");
-  };
+  }
+
+  function $get<T = any>(endpoint: string, options?: RequestInit): Promise<T> {
+    return new Promise(async (resolve, reject) => {
+      loading.value = true;
+      try {
+        const response = await $fetch(endpoint, { ...options, method: "GET" });
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      } finally {
+        loading.value = false;
+      }
+    });
+  }
+
+  function $post<T = any>(
+    endpoint: string,
+    data?: any,
+    options?: RequestInit
+  ): Promise<T> {
+    return new Promise(async (resolve, reject) => {
+      loading.value = true;
+      try {
+        const response = await $fetch(endpoint, {
+          ...options,
+          method: "POST",
+          body: data ? JSON.stringify(data) : undefined,
+        });
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      } finally {
+        loading.value = false;
+      }
+    });
+  }
+
+  function $put<T = any>(
+    endpoint: string,
+    data?: any,
+    options?: RequestInit
+  ): Promise<T> {
+    return new Promise(async (resolve, reject) => {
+      loading.value = true;
+      try {
+        const response = await $fetch(endpoint, {
+          ...options,
+          method: "PUT",
+          body: data ? JSON.stringify(data) : undefined,
+        });
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      } finally {
+        loading.value = false;
+      }
+    });
+  }
+
+  function $patch<T = any>(
+    endpoint: string,
+    data?: any,
+    options?: RequestInit
+  ): Promise<T> {
+    return new Promise(async (resolve, reject) => {
+      loading.value = true;
+      try {
+        const response = await $fetch(endpoint, {
+          ...options,
+          method: "PATCH",
+          body: data ? JSON.stringify(data) : undefined,
+        });
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      } finally {
+        loading.value = false;
+      }
+    });
+  }
+
+  function $delete<T = any>(
+    endpoint: string,
+    options?: RequestInit
+  ): Promise<T> {
+    return new Promise(async (resolve, reject) => {
+      loading.value = true;
+      try {
+        const response = await $fetch(endpoint, {
+          ...options,
+          method: "DELETE",
+        });
+        resolve(response);
+      } catch (error) {
+        reject(error);
+      } finally {
+        loading.value = false;
+      }
+    });
+  }
 
   return {
-    // State
-    loading: readonly(loading),
-    error: readonly(error),
-
-    // HTTP methods
-    request,
-    get,
-    post,
-    put,
-    del,
-
-    // Auth methods
-    login,
-    getUserProfile,
+    loading,
+    baseURL,
+    $get,
+    $post,
+    $put,
+    $patch,
+    $delete,
+    setTokens,
+    clearTokens,
+    getAccessToken,
+    getRefreshToken,
     logout,
-
-    // Utility
-    clearError: () => (error.value = null),
+    getUserProfile,
   };
-}
+};

@@ -7,6 +7,10 @@ export function setAuthToken(accessToken, refreshToken) {
   
   // Set refresh token cookie
   document.cookie = `refresh_token=${refreshCookieValue}; path=/; secure; samesite=strict`;
+  
+  // Also store in localStorage for compatibility with useApi
+  localStorage.setItem("access_token", accessToken);
+  localStorage.setItem("refresh_token", refreshToken);
 }
 
 export function setAccessToken(token) {
@@ -52,10 +56,18 @@ export function clearAuthToken() {
   document.cookie = `access_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
   // Clear refresh token
   document.cookie = `refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+  
+  // Also clear localStorage tokens
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
 }
 
 export function isAuthenticated() {
-  return Boolean(getAccessToken());
+  // Check both cookies and localStorage for compatibility
+  const cookieToken = getAccessToken();
+  const localStorageToken = localStorage.getItem("access_token");
+  
+  return Boolean(cookieToken || localStorageToken);
 }
 
 
