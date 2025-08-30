@@ -31,7 +31,7 @@ import { Label } from "@/components/ui/label";
 						<Button type="submit" class="w-full"> Sign up </Button>
 						<div class="text-center text-sm">
 							Already have an account?
-							<RouterLink class="underline underline-offset-4" to="/login"> Login </RouterLink>
+							<RouterLink class="underline underline-offset-4" to="/auth/login"> Login </RouterLink>
 						</div>
 					</div>
 				</form>

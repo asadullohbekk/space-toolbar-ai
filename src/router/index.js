@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard/index.vue";
 import FaceRecognition from "@/pages/face-recognition.vue";
 import Chatbot from "@/pages/chatbot.vue";
 import { isAuthenticated } from "@/lib/auth";
+import Callback from "@/pages/auth/Callback.vue";
 
 const routes = [
   {
@@ -30,19 +31,25 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/login",
+    path: "/auth/login",
     name: "Login",
     component: Login,
     meta: { public: true, layout: "auth" },
   },
   {
-    path: "/register",
+    path: "/auth/callback",
+    name: "Callback",
+    component: Callback,
+    meta: { public: true, layout: "auth" },
+  },
+  {
+    path: "/auth/register",
     name: "Register",
     component: Register,
     meta: { public: true, layout: "auth" },
   },
   {
-    path: "/reset-password",
+    path: "/auth/reset-password",
     name: "ResetPassword",
     component: ResetPassword,
     meta: { public: true, layout: "auth" },
@@ -76,7 +83,7 @@ const routes = [
         return { path: "/dashboard" };
       } else {
         // If not authenticated, redirect to login with the attempted path
-        return { path: "/login", query: { redirect: to.fullPath } };
+        return { path: "/auth/login" };
       }
     },
   },
@@ -96,7 +103,7 @@ router.beforeEach((to) => {
     return true;
   }
   if (to.meta && to.meta.requiresAuth && !isAuthenticated()) {
-    return { path: "/login", query: { redirect: to.fullPath } };
+    return { path: "/auth/login" };
   }
   return true;
 });

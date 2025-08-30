@@ -1,5 +1,7 @@
 import { computed, ref } from "vue";
 import router from "@/router";
+import { useApi } from "./useApi";
+import { isAuthenticated as checkAuth, setAuthToken } from "@/lib/auth";
 
 interface user {
   message: string;
@@ -16,46 +18,84 @@ interface user {
 
 export const useAuth = () => {
   const user = ref<user | null>(null);
-  //   const { $post } = useApi();
+  const { $post, setTokens } = useApi();
 
-  //   const token = useCookie("access_token", { secure: true, httpOnly: true });
-  const isAuthenticated = computed(() => !!user.value || !!token.value);
+  // Use the centralized auth function
+  const isAuthenticated = computed(() => checkAuth() || !!user.value);
 
   const googleClientId =
-    "184942330142-v8r4lrq2h2a03oreg5164le9ail9br7a.apps.googleusercontent.com";
-  const googleRedirectUri = "http://localhost:5173/auth/callback";
+    "235010568573-94c45tulqla31fbsrpcpl18avkgb91go.apps.googleusercontent.com";
+  // const googleRedirectUri = "http://localhost:5173/auth/callback";
+  const googleRedirectUri = "https://space.asadullohdev.uz/auth/callback";
 
   const loginWithOAuth = () => {
     const scope = "email profile openid";
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=token&scope=${scope}&include_granted_scopes=true`;
+    // Use response_type=code for authorization code flow (more secure)
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&response_type=code&scope=${scope}&include_granted_scopes=true`;
     window.location.href = authUrl;
   };
 
   const handleOAuthCallback = async (): Promise<void> => {
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const accessToken = params.get("access_token");
-
+    // Check if user is already authenticated
     if (isAuthenticated.value) {
       router.push("/");
       return;
     }
 
-    if (accessToken) {
+    // Get the authorization code from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    let code = urlParams.get("code");
+    let error = urlParams.get("error");
+
+    // Fallback: check URL hash for OAuth response (some flows use hash)
+    if (!code && !error && window.location.hash) {
+      console.log("No code in search params, checking hash...");
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      code = code || hashParams.get("code");
+      error = error || hashParams.get("error");
+      console.log("Hash params - code:", code, "error:", error);
+    }
+
+    console.log("OAuth callback - final code:", code, "final error:", error);
+
+    if (error) {
+      console.error("OAuth error:", error);
+      // Handle OAuth error
+      // router.push("/auth/login");
+      return;
+    }
+
+    if (code) {
       try {
-        const res = await $post("api/v1/auth/google/", {
-          body: { access_token: accessToken },
-        });
-        // authStore.setToken(res);
+        const res = await $post("/v1/auth/google/", { code: code });
+
+        // Store tokens using both methods for compatibility
+        if (res.access_token && res.refresh_token) {
+          setTokens(res.access_token, res.refresh_token);
+          setAuthToken(res.access_token, res.refresh_token);
+        } else {
+        }
+
+        // Update user state if user data is returned
+        if (res.user) {
+          user.value = res.user;
+        }
+
         router.push("/");
-        // showToast(getToastMessages("loggedIn"), "success");
       } catch (err: any) {
-        showToast(err._data.error, "error");
-        router.push("/auth/login");
+        console.error("OAuth callback failed:", err);
+        // Handle error - redirect to login
+        // router.push("/auth/login");
       }
     } else {
-      // showToast(getToastMessages("oauthFailed"), "error");
-      router.push("/auth/login");
+      console.error("No authorization code received");
+      if (window.location.hash) {
+        const hashParams = new URLSearchParams(
+          window.location.hash.substring(1)
+        );
+      }
+      // No code received, redirect to login
+      // router.push("/auth/login");
     }
   };
 

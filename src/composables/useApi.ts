@@ -52,7 +52,7 @@ export const useApi = (apiUrl?: string) => {
       clearAuthToken();
 
       // Redirect to login page
-      window.location.href = "/login";
+      window.location.href = "/auth/login";
     }
   };
 
@@ -61,11 +61,11 @@ export const useApi = (apiUrl?: string) => {
     try {
       const response = await $get("/auth/me/");
       console.log("getUserProfile: Full API response:", response);
-      
+
       // Extract user data from the result property
       const userData = response.result;
       console.log("getUserProfile: Extracted user data:", userData);
-      
+
       return userData;
     } catch (error) {
       console.error("Failed to get user profile:", error);
