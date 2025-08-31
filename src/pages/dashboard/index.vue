@@ -17,11 +17,9 @@ import {
   Globe,
 } from "lucide-vue-next";
 import { useUserProfile } from "@/composables/useUserProfile";
-import { useApi } from "@/composables/useApi";
 
 // User profile management
 const { user, loading: userLoading, error: userError, fetchUserProfile, cleanup: cleanupUserProfile } = useUserProfile();
-const { testUserProfileFetch } = useApi();
 
 // Handle page refresh and visibility change
 const handleVisibilityChange = async () => {
@@ -98,13 +96,7 @@ const manualRefreshProfile = async () => {
               <span>System Online</span>
             </div>
             
-            <!-- Debug button for testing user profile fetch -->
-            <button
-              @click="testUserProfileFetch"
-              class="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
-            >
-              Test Profile Fetch
-            </button>
+
           </div>
         </div>
       </div>

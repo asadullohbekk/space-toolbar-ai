@@ -93,11 +93,9 @@ export const useAuth = () => {
 
         // Fetch additional user profile data
         try {
-          console.log("OAuth callback: Fetching additional user profile...");
           await fetchUserProfile();
-          console.log("OAuth callback: User profile fetched successfully");
         } catch (profileError) {
-          console.warn("OAuth callback: Failed to fetch user profile, but continuing:", profileError);
+          console.warn("Failed to fetch user profile, but continuing:", profileError);
         }
 
         router.push("/");
