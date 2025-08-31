@@ -28,8 +28,8 @@ export const useAuth = () => {
 
   const googleClientId =
     "235010568573-94c45tulqla31fbsrpcpl18avkgb91go.apps.googleusercontent.com";
-  const googleRedirectUri = "http://localhost:5173/auth/callback";
-  // const googleRedirectUri = "https://space.asadullohdev.uz/auth/callback";
+  // const googleRedirectUri = "http://localhost:5173/auth/callback";
+  const googleRedirectUri = "https://space.asadullohdev.uz/auth/callback";
 
   const loginWithOAuth = () => {
     const scope = "email profile openid";
