@@ -1,5 +1,5 @@
 import { ref, computed } from "vue";
-import { clearAuthToken } from "@/lib/auth";
+import { clearAuthToken, shouldRefreshTokens, refreshTokens } from "@/lib/auth";
 
 export const useApi = (apiUrl?: string) => {
   const baseURL = apiUrl || "https://space.toolbar-ai.com/api";
@@ -75,6 +75,15 @@ export const useApi = (apiUrl?: string) => {
 
   async function $fetch(endpoint: string, options: RequestInit = {}) {
     const url = `${baseURL}${endpoint}`;
+
+    // Check if tokens need refreshing before making the request
+    if (shouldRefreshTokens()) {
+      console.log("Tokens need refreshing, attempting to refresh...");
+      const refreshed = await refreshTokens();
+      if (!refreshed) {
+        console.warn("Failed to refresh tokens, proceeding with current token");
+      }
+    }
 
     const config: RequestInit = {
       ...options,
