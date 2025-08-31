@@ -2,6 +2,7 @@ import { computed, ref } from "vue";
 import router from "@/router";
 import { useApi } from "./useApi";
 import { isAuthenticated as checkAuth, setAuthToken } from "@/lib/auth";
+import { useUserProfile } from "./useUserProfile";
 
 interface User {
   id: number;
@@ -22,6 +23,7 @@ interface AuthResponse {
 export const useAuth = () => {
   const user = ref<User | null>(null);
   const { $post, setTokens } = useApi();
+  const { fetchUserProfile } = useUserProfile();
 
   // Use the centralized auth function
   const isAuthenticated = computed(() => checkAuth() || !!user.value);
@@ -87,6 +89,15 @@ export const useAuth = () => {
         // Update user state if user data is returned
         if (res.user) {
           user.value = res.user;
+        }
+
+        // Fetch additional user profile data
+        try {
+          console.log("OAuth callback: Fetching additional user profile...");
+          await fetchUserProfile();
+          console.log("OAuth callback: User profile fetched successfully");
+        } catch (profileError) {
+          console.warn("OAuth callback: Failed to fetch user profile, but continuing:", profileError);
         }
 
         router.push("/");

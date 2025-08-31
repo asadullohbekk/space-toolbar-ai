@@ -17,9 +17,11 @@ import {
   Globe,
 } from "lucide-vue-next";
 import { useUserProfile } from "@/composables/useUserProfile";
+import { useApi } from "@/composables/useApi";
 
 // User profile management
 const { user, loading: userLoading, error: userError, fetchUserProfile, cleanup: cleanupUserProfile } = useUserProfile();
+const { testUserProfileFetch } = useApi();
 
 // Handle page refresh and visibility change
 const handleVisibilityChange = async () => {
@@ -55,6 +57,17 @@ onUnmounted(() => {
   // Clean up user profile
   cleanupUserProfile();
 });
+
+// Manual refresh function
+const manualRefreshProfile = async () => {
+  try {
+    console.log("Dashboard: Manually refreshing user profile...");
+    await fetchUserProfile();
+    console.log("Dashboard: Manual refresh successful");
+  } catch (error) {
+    console.error("Dashboard: Manual refresh failed:", error);
+  }
+};
 </script>
 
 <template>
@@ -84,12 +97,53 @@ onUnmounted(() => {
               ></div>
               <span>System Online</span>
             </div>
+            
+            <!-- Debug button for testing user profile fetch -->
+            <button
+              @click="testUserProfileFetch"
+              class="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+            >
+              Test Profile Fetch
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-2 py-8">
+      <!-- Debug Information -->
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+        <h3 class="text-lg font-semibold text-yellow-800 mb-2">Debug Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div>
+            <strong>User Loading:</strong> {{ userLoading ? 'Yes' : 'No' }}
+          </div>
+          <div>
+            <strong>User Data:</strong> {{ user ? 'Present' : 'None' }}
+          </div>
+          <div>
+            <strong>User Error:</strong> {{ userError || 'None' }}
+          </div>
+        </div>
+        <div class="mt-2 text-xs text-yellow-700">
+          <strong>User Details:</strong> {{ JSON.stringify(user, null, 2) }}
+        </div>
+        <div class="mt-3 flex space-x-2">
+          <button
+            @click="manualRefreshProfile"
+            class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-xs"
+          >
+            Manual Refresh
+          </button>
+          <button
+            @click="testUserProfileFetch"
+            class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors text-xs"
+          >
+            Test API Fetch
+          </button>
+        </div>
+      </div>
+      
       <!-- Stats Overview -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div
