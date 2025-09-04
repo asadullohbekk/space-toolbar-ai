@@ -2,7 +2,7 @@ import { ref, computed } from "vue";
 import { clearAuthToken, shouldRefreshTokens, refreshTokens } from "@/lib/auth";
 
 export const useApi = (apiUrl?: string) => {
-  const baseURL = apiUrl || "https://space.toolbar-ai.com/api";
+  const baseURL = apiUrl || "https://backend.toolbar-ai.com/api";
 
   const loading = ref(false);
 
@@ -60,7 +60,7 @@ export const useApi = (apiUrl?: string) => {
   const getUserProfile = async () => {
     try {
       const response = await $get("/auth/me/");
-      
+
       // Extract user data - check both possible structures
       let userData;
       if (response.user) {
@@ -73,7 +73,7 @@ export const useApi = (apiUrl?: string) => {
         // Direct response structure
         userData = response;
       }
-      
+
       return userData;
     } catch (error) {
       console.error("Failed to get user profile:", error);
@@ -105,7 +105,9 @@ export const useApi = (apiUrl?: string) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+        throw new Error(
+          `HTTP error! status: ${response.status}, body: ${errorText}`
+        );
       }
 
       return await response.json();

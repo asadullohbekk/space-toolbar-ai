@@ -127,7 +127,7 @@ export async function refreshTokens() {
   try {
     // Call your refresh token endpoint
     const response = await fetch(
-      "https://space.toolbar-ai.com/api/v1/auth/refresh/",
+      "https://backend.toolbar-ai.com/api/v1/auth/refresh/",
       {
         method: "POST",
         headers: {
