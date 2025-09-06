@@ -1,7 +1,9 @@
 import { ref, readonly, onMounted, onUnmounted } from "vue";
 import { useApi } from "./useApi";
+import { setCookie } from "@/lib/utils";
 
 interface UserProfile {
+  id: number;
   username: string;
   full_name: string | null;
   email: string;
@@ -56,6 +58,12 @@ export function useUserProfile() {
       console.log("fetchUserProfile: user.value.email:", user.value?.email);
       console.log("fetchUserProfile: user.value.balance:", user.value?.balance);
       
+      // Save user ID to cookie as chat_session_id
+      if (profile?.id) {
+        setCookie('chat_session_id', profile.id.toString(), 30); // 30 days
+        console.log("fetchUserProfile: Saved chat_session_id to cookie:", profile.id);
+      }
+      
       return profile;
     } catch (err: any) {
       console.error("fetchUserProfile: Error occurred:", err);
@@ -69,6 +77,11 @@ export function useUserProfile() {
   const clearUserProfile = () => {
     user.value = null;
     error.value = null;
+    // Clear chat_session_id cookie when clearing user profile
+    if (typeof document !== 'undefined') {
+      document.cookie = 'chat_session_id=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;';
+      console.log("clearUserProfile: Cleared chat_session_id cookie");
+    }
   };
 
   // Handle page refresh and visibility change events
