@@ -1,4 +1,4 @@
-import { ref, readonly } from "vue";
+import { ref, readonly, onMounted, onUnmounted } from "vue";
 import { useApi } from "./useApi";
 
 interface UserProfile {
@@ -15,6 +15,7 @@ interface UserProfile {
 let globalUser: ReturnType<typeof ref<UserProfile | null>> | null = null;
 let globalLoading: ReturnType<typeof ref<boolean>> | null = null;
 let globalError: ReturnType<typeof ref<string | null>> | null = null;
+let globalRefreshListeners: Array<() => void> = [];
 
 export function useUserProfile() {
   // Initialize global state if it doesn't exist
@@ -30,12 +31,17 @@ export function useUserProfile() {
   const loading = globalLoading!;
   const error = globalError!;
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = async (forceRefresh = false) => {
+    // If already loading and not forcing refresh, return current promise
+    if (loading.value && !forceRefresh) {
+      return user.value;
+    }
+
     loading.value = true;
     error.value = null;
     
     try {
-      console.log("fetchUserProfile: Starting to fetch profile...");
+      console.log("fetchUserProfile: Starting to fetch profile...", forceRefresh ? "(forced refresh)" : "");
       const profile = await getUserProfile();
       console.log("fetchUserProfile: Received profile:", profile);
       console.log("fetchUserProfile: Profile type:", typeof profile);
@@ -65,20 +71,66 @@ export function useUserProfile() {
     error.value = null;
   };
 
+  // Handle page refresh and visibility change events
+  const handlePageRefresh = async () => {
+    console.log("useUserProfile: Page refresh detected, refreshing user profile...");
+    try {
+      await fetchUserProfile(true); // Force refresh
+    } catch (error) {
+      console.error("useUserProfile: Failed to refresh profile on page refresh:", error);
+    }
+  };
+
+  const handleVisibilityChange = async () => {
+    if (!document.hidden && !user.value) {
+      console.log("useUserProfile: Page became visible and no user data, fetching profile...");
+      try {
+        await fetchUserProfile(true); // Force refresh
+      } catch (error) {
+        console.error("useUserProfile: Failed to fetch profile on visibility change:", error);
+      }
+    }
+  };
+
   // Listen for logout events to clear user profile
   const handleLogout = () => {
     clearUserProfile();
   };
 
-  // Add event listener for logout
+  // Add event listeners
   if (typeof window !== 'undefined') {
+    // Page refresh detection
+    window.addEventListener('beforeunload', () => {
+      // Mark that we're about to refresh
+      sessionStorage.setItem('pageRefreshing', 'true');
+    });
+
+    // Check if page was refreshed
+    const wasRefreshed = sessionStorage.getItem('pageRefreshing');
+    if (wasRefreshed) {
+      sessionStorage.removeItem('pageRefreshing');
+      // Small delay to ensure everything is loaded
+      setTimeout(handlePageRefresh, 100);
+    }
+
+    // Visibility change events
+    window.addEventListener('focus', handleVisibilityChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Logout events
     window.addEventListener('userLogout', handleLogout);
+
+    // Custom refresh event for installation page
+    window.addEventListener('refreshUserProfile', handlePageRefresh);
   }
 
-  // Cleanup function to remove event listener
+  // Cleanup function to remove event listeners
   const cleanup = () => {
     if (typeof window !== 'undefined') {
+      window.removeEventListener('focus', handleVisibilityChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('userLogout', handleLogout);
+      window.removeEventListener('refreshUserProfile', handlePageRefresh);
     }
   };
 
@@ -92,5 +144,8 @@ export function useUserProfile() {
     fetchUserProfile,
     clearUserProfile,
     cleanup,
+    
+    // Utility functions
+    refreshProfile: () => fetchUserProfile(true),
   };
 }

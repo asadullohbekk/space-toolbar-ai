@@ -19,17 +19,38 @@ import {
 import { useUserProfile } from "@/composables/useUserProfile";
 
 // User profile management
-const { user, loading: userLoading, error: userError, fetchUserProfile, cleanup: cleanupUserProfile } = useUserProfile();
+const {
+  user,
+  loading: userLoading,
+  error: userError,
+  fetchUserProfile,
+  refreshProfile,
+  cleanup: cleanupUserProfile,
+} = useUserProfile();
 
 // Handle page refresh and visibility change
 const handleVisibilityChange = async () => {
   if (!document.hidden && !user.value) {
     // Page became visible and no user data, fetch profile
     try {
-      await fetchUserProfile();
+      await fetchUserProfile(true); // Force refresh
     } catch (error) {
-      console.error("Failed to fetch user profile on visibility change:", error);
+      console.error(
+        "Failed to fetch user profile on visibility change:",
+        error
+      );
     }
+  }
+};
+
+// Handle installation page refresh specifically
+const handleInstallationRefresh = async () => {
+  console.log("Dashboard: Handling installation page refresh...");
+  try {
+    await refreshProfile();
+    console.log("Dashboard: Installation refresh successful");
+  } catch (error) {
+    console.error("Dashboard: Installation refresh failed:", error);
   }
 };
 
@@ -40,10 +61,22 @@ onMounted(async () => {
   } catch (error) {
     console.error("Failed to fetch user profile:", error);
   }
+
+  // Check if we're coming from installation page
+  const urlParams = new URLSearchParams(window.location.search);
+  const fromInstallation = urlParams.get('from') === 'installation';
   
+  if (fromInstallation) {
+    console.log("Dashboard: Detected installation page redirect, refreshing profile...");
+    setTimeout(handleInstallationRefresh, 1000); // Delay to ensure page is fully loaded
+  }
+
   // Add event listeners for page refresh and visibility change
   window.addEventListener("focus", handleVisibilityChange);
   document.addEventListener("visibilitychange", handleVisibilityChange);
+  
+  // Listen for custom refresh events
+  window.addEventListener("refreshUserProfile", handleInstallationRefresh);
 });
 
 // Clean up event listeners
@@ -51,7 +84,8 @@ onUnmounted(() => {
   // Remove event listeners
   window.removeEventListener("focus", handleVisibilityChange);
   document.removeEventListener("visibilitychange", handleVisibilityChange);
-  
+  window.removeEventListener("refreshUserProfile", handleInstallationRefresh);
+
   // Clean up user profile
   cleanupUserProfile();
 });
@@ -60,7 +94,7 @@ onUnmounted(() => {
 const manualRefreshProfile = async () => {
   try {
     console.log("Dashboard: Manually refreshing user profile...");
-    await fetchUserProfile();
+    await refreshProfile();
     console.log("Dashboard: Manual refresh successful");
   } catch (error) {
     console.error("Dashboard: Manual refresh failed:", error);
@@ -95,47 +129,12 @@ const manualRefreshProfile = async () => {
               ></div>
               <span>System Online</span>
             </div>
-            
-
           </div>
         </div>
       </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-2 py-8">
-      <!-- Debug Information -->
-      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-        <h3 class="text-lg font-semibold text-yellow-800 mb-2">Debug Information</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          <div>
-            <strong>User Loading:</strong> {{ userLoading ? 'Yes' : 'No' }}
-          </div>
-          <div>
-            <strong>User Data:</strong> {{ user ? 'Present' : 'None' }}
-          </div>
-          <div>
-            <strong>User Error:</strong> {{ userError || 'None' }}
-          </div>
-        </div>
-        <div class="mt-2 text-xs text-yellow-700">
-          <strong>User Details:</strong> {{ JSON.stringify(user, null, 2) }}
-        </div>
-        <div class="mt-3 flex space-x-2">
-          <button
-            @click="manualRefreshProfile"
-            class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-xs"
-          >
-            Manual Refresh
-          </button>
-          <button
-            @click="testUserProfileFetch"
-            class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors text-xs"
-          >
-            Test API Fetch
-          </button>
-        </div>
-      </div>
-      
       <!-- Stats Overview -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div

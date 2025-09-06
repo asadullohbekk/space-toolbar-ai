@@ -8,6 +8,7 @@ import ResetPassword from "@/pages/auth/ResetPassword.vue";
 import Dashboard from "@/pages/dashboard/index.vue";
 import FaceRecognition from "@/pages/face-recognition.vue";
 import Chatbot from "@/pages/chatbot.vue";
+import TestInstallation from "@/pages/test-installation.vue";
 import { isAuthenticated } from "@/lib/auth";
 import Callback from "@/pages/auth/Callback.vue";
 
@@ -70,6 +71,12 @@ const routes = [
     path: "/chatbot",
     name: "Chatbot",
     component: Chatbot,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/test-installation",
+    name: "TestInstallation",
+    component: TestInstallation,
     meta: { requiresAuth: true },
   },
   // Catch-all route for non-existent URLs
