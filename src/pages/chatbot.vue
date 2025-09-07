@@ -116,7 +116,7 @@ const sendMessage = async () => {
   scrollToBottom();
 
   try {
-    const response = await $post("/chat/", {
+    const response = await $post("/chat/chat/", {
       session_id: sessionId,
       query: currentInput,
       lang: "uz",
@@ -125,7 +125,7 @@ const sendMessage = async () => {
     // AI javobini qo'shish
     const aiMessage = {
       id: Date.now() + 1,
-      context: response.answer,
+      context: response.response,
       displayText: "",
       isAnimationComplete: false,
       type: "ai",
