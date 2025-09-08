@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard/index.vue";
 import FaceRecognition from "@/pages/face-recognition.vue";
 import Chatbot from "@/pages/chatbot.vue";
 import TestInstallation from "@/pages/test-installation.vue";
+import VoiceAgent from "@/pages/voice-agent.vue";
 import { isAuthenticated } from "@/lib/auth";
 import Callback from "@/pages/auth/Callback.vue";
 
@@ -77,6 +78,12 @@ const routes = [
     path: "/test-installation",
     name: "TestInstallation",
     component: TestInstallation,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/voice-agent",
+    name: "VoiceAgent",
+    component: VoiceAgent,
     meta: { requiresAuth: true },
   },
   // Catch-all route for non-existent URLs

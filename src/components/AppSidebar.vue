@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { Eye, MessageCircle, ChevronRight, Home, Brain, Bot } from "lucide-vue-next";
+import {
+  Eye,
+  MessageCircle,
+  ChevronRight,
+  Home,
+  Brain,
+  Bot,
+  AudioLines,
+  Mic,
+} from "lucide-vue-next";
 import {
   Sidebar,
   SidebarContent,
@@ -35,6 +44,11 @@ const items = [
     icon: Bot,
     items: [{ title: "Chatbot", url: "/chatbot", icon: MessageCircle }],
   },
+  {
+    title: "Voices",
+    icon: AudioLines,
+    items: [{ title: "Voice Agent", url: "/voice-agent", icon: Mic }],
+  },
 ];
 
 // Check if a menu item is active
@@ -58,7 +72,12 @@ const isGroupActive = (group: { items: Array<{ url: string }> }) => {
         <SidebarGroupContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild :tooltip="'Dashboard'" :is-active="isActive('/')" class="cursor-pointer">
+              <SidebarMenuButton
+                asChild
+                :tooltip="'Dashboard'"
+                :is-active="isActive('/')"
+                class="cursor-pointer"
+              >
                 <RouterLink to="/">
                   <Home />
                   <span>Dashboard</span>
@@ -74,7 +93,10 @@ const isGroupActive = (group: { items: Array<{ url: string }> }) => {
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger as-child>
-                  <SidebarMenuButton :tooltip="item.title" class="cursor-pointer">
+                  <SidebarMenuButton
+                    :tooltip="item.title"
+                    class="cursor-pointer"
+                  >
                     <component :is="item.icon" v-if="item.icon" />
                     <span>{{ item.title }}</span>
                     <ChevronRight
@@ -88,7 +110,10 @@ const isGroupActive = (group: { items: Array<{ url: string }> }) => {
                       v-for="subItem in item.items"
                       :key="subItem.title"
                     >
-                      <SidebarMenuSubButton as-child :is-active="isActive(subItem.url)">
+                      <SidebarMenuSubButton
+                        as-child
+                        :is-active="isActive(subItem.url)"
+                      >
                         <RouterLink :to="subItem.url">
                           <span>{{ subItem.title }}</span>
                         </RouterLink>
