@@ -127,6 +127,16 @@
   }
 }
 
+/* Page fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 300ms ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 @theme inline {
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);

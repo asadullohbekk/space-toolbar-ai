@@ -31,7 +31,11 @@ onMounted(() => {
 <template>
   <div class="min-h-screen bg-gray-50 w-full">
     <template v-if="isAuthLayout">
-      <RouterView />
+      <RouterView v-slot="{ Component, route }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" :key="route.fullPath" />
+        </transition>
+      </RouterView>
     </template>
     <template v-else>
       <SidebarProvider>
@@ -40,7 +44,11 @@ onMounted(() => {
           <div class="flex-1 flex flex-col">
             <AppHeader />
             <main class="flex-1 p-4 pt-6">
-              <RouterView />
+              <RouterView v-slot="{ Component, route }">
+                <transition name="fade" mode="out-in">
+                  <component :is="Component" :key="route.fullPath" />
+                </transition>
+              </RouterView>
             </main>
           </div>
         </div>

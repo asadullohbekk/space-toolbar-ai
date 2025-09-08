@@ -3,6 +3,7 @@ import router from "@/router";
 import { useApi } from "./useApi";
 import { isAuthenticated as checkAuth, setAuthToken } from "@/lib/auth";
 import { useUserProfile } from "./useUserProfile";
+import { useToast } from "vue-toast-notification";
 
 interface User {
   id: number;
@@ -24,6 +25,7 @@ export const useAuth = () => {
   const user = ref<User | null>(null);
   const { $post, setTokens } = useApi();
   const { fetchUserProfile } = useUserProfile();
+  const toast = useToast();
 
   // Use the centralized auth function
   const isAuthenticated = computed(() => checkAuth() || !!user.value);
@@ -100,6 +102,14 @@ export const useAuth = () => {
             profileError
           );
         }
+
+        // Notify success login
+        try {
+          toast.success("You have successfully logged into the system", {
+            position: "top-right",
+            duration: 2000,
+          });
+        } catch {}
 
         router.push("/");
       } catch (err: any) {

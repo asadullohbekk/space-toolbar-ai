@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Home, Eye, MessageCircle } from "lucide-vue-next";
+import { Eye, MessageCircle, ChevronRight, Home, Brain, Bot } from "lucide-vue-next";
 import {
   Sidebar,
   SidebarContent,
@@ -9,28 +9,31 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { useRoute } from "vue-router";
 import { computed } from "vue";
 
 const route = useRoute();
 
-// Menu items.
+// Collapsible groups and sub-items.
 const items = [
   {
-    title: "Dashboard",
-    url: "/",
-    icon: Home,
+    title: "Models",
+    icon: Brain,
+    items: [{ title: "Face recognition", url: "/face-recognition", icon: Eye }],
   },
   {
-    title: "Face Recognition",
-    url: "/face-recognition",
-    icon: Eye,
-  },
-  {
-    title: "Chatbot",
-    url: "/chatbot",
-    icon: MessageCircle,
+    title: "Agents",
+    icon: Bot,
+    items: [{ title: "Chatbot", url: "/chatbot", icon: MessageCircle }],
   },
 ];
 
@@ -41,6 +44,10 @@ const isActive = (url: string) => {
   }
   return route.path.startsWith(url);
 };
+
+const isGroupActive = (group: { items: Array<{ url: string }> }) => {
+  return group.items.some((sub) => isActive(sub.url));
+};
 </script>
 
 <template>
@@ -50,47 +57,47 @@ const isActive = (url: string) => {
         <SidebarGroupLabel>Services</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
-            <SidebarMenuItem v-for="item in items" :key="item.title">
-              <SidebarMenuButton
-                asChild
-                :class="[
-                  'transition-all duration-200',
-                  isActive(item.url)
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900',
-                ]"
-              >
-                <RouterLink
-                  :to="item.url"
-                  :class="[
-                    'flex items-center space-x-3 px-3 py-2 rounded-lg w-full',
-                    isActive(item.url)
-                      ? 'text-blue-700'
-                      : 'text-gray-700 hover:text-gray-900',
-                  ]"
-                >
-                  <component
-                    :is="item.icon"
-                    :class="[
-                      'w-5 h-5',
-                      isActive(item.url)
-                        ? 'text-blue-600'
-                        : 'text-gray-500 group-hover:text-gray-700',
-                    ]"
-                  />
-                  <span
-                    :class="[
-                      'font-medium',
-                      isActive(item.url)
-                        ? 'text-blue-700'
-                        : 'text-gray-700 group-hover:text-gray-900',
-                    ]"
-                  >
-                    {{ item.title }}
-                  </span>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild :tooltip="'Dashboard'" :is-active="isActive('/')" class="cursor-pointer">
+                <RouterLink to="/">
+                  <Home />
+                  <span>Dashboard</span>
                 </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            <Collapsible
+              v-for="item in items"
+              :key="item.title"
+              as-child
+              :default-open="isGroupActive(item)"
+              class="group/collapsible cursor-pointer"
+            >
+              <SidebarMenuItem>
+                <CollapsibleTrigger as-child>
+                  <SidebarMenuButton :tooltip="item.title" class="cursor-pointer">
+                    <component :is="item.icon" v-if="item.icon" />
+                    <span>{{ item.title }}</span>
+                    <ChevronRight
+                      class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+                    />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem
+                      v-for="subItem in item.items"
+                      :key="subItem.title"
+                    >
+                      <SidebarMenuSubButton as-child :is-active="isActive(subItem.url)">
+                        <RouterLink :to="subItem.url">
+                          <span>{{ subItem.title }}</span>
+                        </RouterLink>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
