@@ -14,11 +14,13 @@ import { useApi } from "@/composables/useApi";
 import { useRouter, useRoute } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import { setAuthToken } from "@/lib/auth";
+import { useToast } from "vue-toast-notification";
 
 const router = useRouter();
 const route = useRoute();
 const { $post } = useApi();
 const { loginWithOAuth } = useAuth();
+const toast = useToast();
 
 const loading = ref(false);
 
@@ -44,6 +46,12 @@ const handleSubmit = async (e: Event) => {
       // Also store in localStorage for useApi compatibility
       localStorage.setItem("access_token", response.access);
       localStorage.setItem("refresh_token", response.refresh);
+
+      // Show success toast
+      toast.success("Successfully logged into the system.", {
+        position: "top-right",
+        duration: 2000,
+      });
 
       // Get redirect path from query parameter or default to dashboard
       const redirectPath = (route.query.redirect as string) || "/dashboard";

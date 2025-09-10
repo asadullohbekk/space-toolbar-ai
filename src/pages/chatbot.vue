@@ -3,10 +3,7 @@ import {
   Send,
   Bot,
   User,
-  Settings,
-  Download,
-  Share2,
-  RefreshCw,
+  Upload,
   MessageCircle,
   TrendingUp,
   Users,
@@ -16,6 +13,7 @@ import {
 import { ref, nextTick, onMounted } from "vue";
 import { useApi } from "@/composables/useApi";
 import { getCookie } from "@/lib/utils";
+import { useToast } from "vue-toast-notification";
 
 const isAnimating = ref(false);
 const messages = ref([
@@ -39,9 +37,13 @@ const isLimitReached = ref(false);
 const inputRef = ref(null);
 const userInput = ref("");
 const isLoading = ref(false);
+const uploadedFileName = ref("");
+const fileInputRef = ref(null);
+const isUploading = ref(false);
 
 // API composable
 const { $post } = useApi();
+const toast = useToast();
 const scrollToBottom = () => {
   setTimeout(() => {
     const chatContainer = document.querySelector(".chat-container");
@@ -179,6 +181,61 @@ const handleKeyPress = (event) => {
   }
 };
 
+// File upload functions
+const handleFileUpload = () => {
+  fileInputRef.value?.click();
+};
+
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    // Check if file is .txt format
+    if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+      uploadedFileName.value = file.name;
+      isUploading.value = true;
+
+      try {
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("lang", "uz");
+
+        // Make API request to upload file
+        const response = await fetch("http://142.93.97.162:8020/upload_txt/", {
+          method: "POST",
+          body: formData,
+          headers: {
+            accept: "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("File uploaded successfully:", result);
+          
+          // Show success toast
+          toast.success("Data successfully added. Now you can ask questions about this data", {
+            position: "top-right",
+            duration: 3000,
+          });
+        } else {
+          console.error("Upload failed:", response.statusText);
+          // alert('Fayl yuklashda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+        }
+      } catch (error) {
+        console.error("Upload error:", error);
+        // alert('Fayl yuklashda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+      } finally {
+        isUploading.value = false;
+      }
+    } else {
+      alert("Faqat .txt formatidagi fayllarni yuklashingiz mumkin");
+    }
+  }
+  // Clear the input so the same file can be uploaded again
+  event.target.value = "";
+};
+
 // Component mount bo'lganda animatsiyani boshlash
 onMounted(() => {
   setTimeout(() => {
@@ -212,16 +269,38 @@ onMounted(() => {
                 </div>
                 <div class="ml-auto flex items-center space-x-2">
                   <button
-                    class="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    @click="handleFileUpload"
+                    :disabled="isUploading"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <RefreshCw class="w-4 h-4" />
+                    <Upload class="w-4 h-4" v-if="!isUploading" />
+                    <Loader2 class="w-4 h-4 animate-spin" v-if="isUploading" />
+                    <span class="text-sm font-medium">
+                      {{ isUploading ? "Uploading..." : "Upload Data" }}
+                    </span>
                   </button>
-                  <button
-                    class="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <Settings class="w-4 h-4" />
-                  </button>
+                  <!-- Hidden file input -->
+                  <input
+                    ref="fileInputRef"
+                    type="file"
+                    accept=".txt"
+                    @change="handleFileChange"
+                    class="hidden"
+                  />
                 </div>
+              </div>
+            </div>
+
+            <!-- Uploaded File Display -->
+            <div
+              v-if="uploadedFileName"
+              class="px-4 py-2 bg-green-50 border-b border-green-200"
+            >
+              <div class="flex items-center space-x-2">
+                <Upload class="w-4 h-4 text-green-600" />
+                <span class="text-sm text-green-800 font-medium">
+                  Uploaded Data: {{ uploadedFileName }}
+                </span>
               </div>
             </div>
 
